@@ -1,53 +1,114 @@
-// modules/catalogs/countries/CountryFormModal.tsx
-import { useEffect, useState } from 'react';
+import { Card, Button, Input } from '@/components/ui';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/app/supabase';
+import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 
-type Props = {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: { name: string; iso: string }) => void;
-  initialData?: { name: string; iso: string };
+type Country = {
+  id: number;
+  iso: string;
+  name: string;
+};
+
+type FormValues = {
+  iso: string;
+  name: string;
 };
 
 export function CountryFormModal({
   open,
+  country,
   onClose,
-  onSubmit,
-  initialData,
-}: Props) {
-  const [name, setName] = useState('');
-  const [iso, setIso] = useState('');
+}: {
+  open: boolean;
+  country?: Country | null;
+  onClose: () => void;
+}) {
+  const queryClient = useQueryClient();
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<FormValues>({
+    defaultValues: {
+      iso: '',
+      name: '',
+    },
+  });
+
+  // 👉 Cuando cambia el país (editar vs nuevo)
   useEffect(() => {
-    if (initialData) {
-      setName(initialData.name);
-      setIso(initialData.iso);
+    if (country) {
+      reset({
+        iso: country.iso,
+        name: country.name,
+      });
+    } else {
+      reset({
+        iso: '',
+        name: '',
+      });
     }
-  }, [initialData]);
+  }, [country, reset]);
+
+  const mutation = useMutation({
+    mutationFn: async (form: FormValues) => {
+      if (country) {
+        const { error } = await supabase
+          .from('mvp_countries')
+          .update(form)
+          .eq('id', country.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('mvp_countries')
+          .insert(form);
+
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['countries'] });
+      onClose();
+    },
+  });
 
   if (!open) return null;
 
   return (
-    <div className="modal">
-      <h2>{initialData ? 'Editar país' : 'Nuevo país'}</h2>
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
+      <Card className="w-full max-w-md p-6">
+        <h2 className="font-semibold mb-4">
+          {country ? 'Editar país' : 'Nuevo país'}
+        </h2>
 
-      <input
-        placeholder="Nombre"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+        <form
+          onSubmit={handleSubmit((data) => mutation.mutate(data))}
+          className="space-y-3"
+        >
+          <Input
+            placeholder="ISO (MX)"
+            {...register('iso', { required: true })}
+          />
 
-      <input
-        placeholder="ISO (MX, US)"
-        value={iso}
-        maxLength={2}
-        onChange={(e) => setIso(e.target.value.toUpperCase())}
-      />
+          <Input
+            placeholder="Nombre"
+            {...register('name', { required: true })}
+          />
 
-      <button onClick={() => onSubmit({ name, iso })}>
-        Guardar
-      </button>
-
-      <button onClick={onClose}>Cancelar</button>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="submit" loading={isSubmitting || mutation.isPending}>
+              Guardar
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 }

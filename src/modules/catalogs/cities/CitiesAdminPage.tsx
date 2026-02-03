@@ -1,19 +1,19 @@
 import { Card, Button, Table } from '@/components/ui';
-import { useStates } from '@/hooks/useStates';
+import { useCities } from '@/hooks/useCities';
 import { useState } from 'react';
-import { StateFormModal } from './StateFormModal';
+import { CityFormModal } from './CityFormModal';
 
-export function StatesPage() {
-  const { data = [], isLoading } = useStates();
+export function CitiesAdminPage() {
+  const { data = [], isLoading } = useCities();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
 
   return (
     <Card>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-lg font-semibold">Estados</h1>
+        <h1 className="text-lg font-semibold">Ciudades</h1>
         <Button onClick={() => setOpen(true)}>
-          Nuevo estado
+          Nueva ciudad
         </Button>
       </div>
 
@@ -23,21 +23,21 @@ export function StatesPage() {
         <Table>
           <thead className="bg-gray-100">
             <tr>
+              <th className="p-2 text-left">Ciudad</th>
               <th className="p-2 text-left">Estado</th>
-              <th className="p-2 text-left">País</th>
               <th className="p-2 text-right">Acciones</th>
             </tr>
           </thead>
 
           <tbody>
-            {data.map((state) => (
-              <tr key={state.id} className="border-t">
-                <td className="p-2">{state.name}</td>
-                <td className="p-2">{state.country?.name}</td>
+          {data.map((city) => (
+              <tr key={city.id} className="border-t">
+                <td className="p-2">{city.name}</td>
+                <td className="p-2">{city.state?.name}</td>                
                 <td className="p-2 text-right">
                   <button
                     onClick={() => {
-                      setEditing(state);
+                      setEditing(city);
                       setOpen(true);
                     }}
                     className="text-sm text-blue-600 hover:underline"
@@ -51,9 +51,9 @@ export function StatesPage() {
         </Table>
       )}
 
-      <StateFormModal
+      <CityFormModal
         open={open}
-        state={editing}
+        city={editing}
         onClose={() => {
           setOpen(false);
           setEditing(null);

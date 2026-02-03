@@ -7,8 +7,8 @@ export function DashboardLayout() {
     <div className="flex h-screen bg-gray-100">
       
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r">
-        <div className="p-4 font-bold text-lg border-b">
+      <aside className="w-64 bg-white border-r print:hidden">
+        <div className="h-14 p-4 font-bold text-lg border-b">
           Facturación
         </div>
 
@@ -35,7 +35,7 @@ export function DashboardLayout() {
       <div className="flex flex-col flex-1">
         
         {/* Header */}
-        <header className="h-14 bg-white border-b flex items-center justify-between px-4">
+        <header className="h-14 bg-white border-b flex items-center justify-between px-4 print:hidden">
           <span className="text-sm text-gray-500">
             Sistema de Facturación
           </span>

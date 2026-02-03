@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getClients, deleteClient } from './clients.service';
 import { Client } from './clients.types';
+import { Table } from '@/components/ui/Table';
 
 export function ClientsTable({
   onEdit,
@@ -34,15 +35,16 @@ export function ClientsTable({
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      <table className="w-full bg-white border rounded">
+      <Table>
         <thead className="bg-gray-50 text-sm">
           <tr>
-            <th className="p-2">Nombre</th>
-            <th className="p-2">RFC</th>
-            <th className="p-2">Teléfono</th>
-            <th className="p-2 w-32 text-right">Acciones</th>
+            <th className="p-2 text-left">Nombre</th>
+            <th className="p-2 text-left">RFC</th>
+            <th className="p-2 text-left">Teléfono</th>
+            <th className="p-2 text-right w-32">Acciones</th>
           </tr>
         </thead>
+
         <tbody>
           {data.map((c) => (
             <tr key={c.id} className="border-t text-sm">
@@ -59,11 +61,7 @@ export function ClientsTable({
 
                 <button
                   onClick={() => {
-                    if (
-                      confirm(
-                        `¿Eliminar el cliente "${c.name}"?`
-                      )
-                    ) {
+                    if (confirm(`¿Eliminar el cliente "${c.name}"?`)) {
                       deleteMutation.mutate(c.id);
                     }
                   }}
@@ -75,7 +73,7 @@ export function ClientsTable({
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </>
   );
 }

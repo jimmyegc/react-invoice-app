@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/app/supabase';
 import { useState } from 'react';
 
@@ -17,6 +17,7 @@ type FormData = {
 
 export function CompanySetupPage() {
   const [submitted, setSubmitted] = useState(false);
+  const queryClient = useQueryClient();
 
   const navigate = useNavigate();
 
@@ -45,9 +46,13 @@ export function CompanySetupPage() {
 
       return company;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company'] });
+    onSuccess: async () => {      
+      await queryClient.invalidateQueries({ queryKey: ['company'] });
+      await queryClient.refetchQueries({ queryKey: ['company'] });
       navigate('/');
+    },
+    onError: () => {
+      setSubmitted(false);
     },
   });
 

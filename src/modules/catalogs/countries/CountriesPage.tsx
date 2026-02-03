@@ -1,79 +1,64 @@
-// modules/catalogs/countries/CountriesPage.tsx
-import { useEffect, useState } from 'react';
-import { useCountries } from './useCountries';
+import { Card, Button, Table } from '@/components/ui';
+import { useCountries } from '@/hooks/useCountries';
+import { useState } from 'react';
 import { CountryFormModal } from './CountryFormModal';
 
 export function CountriesPage() {
-  const { getCountries, createCountry, updateCountry, deleteCountry } =
-    useCountries();
-
-  const [countries, setCountries] = useState<any[]>([]);
+  const { data = [], isLoading } = useCountries();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any | null>(null);
-
-  const loadData = async () => {
-    const data = await getCountries();
-    setCountries(data);
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const handleSubmit = async (data: { name: string; iso: string }) => {
-    if (editing) {
-      await updateCountry(editing.id, data);
-    } else {
-      await createCountry(data);
-    }
-    setOpen(false);
-    setEditing(null);
-    loadData();
-  };
+  const [editing, setEditing] = useState<any>(null);
 
   return (
-    <>
-      <button onClick={() => setOpen(true)}>Nuevo país</button>
+    <Card>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-lg font-semibold">Países</h1>
+        <Button onClick={() => setOpen(true)}>
+          Nuevo país
+        </Button>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>ISO</th>
-            <th>Nombre</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {countries.map((c) => (
-            <tr key={c.id}>
-              <td>{c.iso}</td>
-              <td>{c.name}</td>
-              <td>
-                <button onClick={() => {
-                  setEditing(c);
-                  setOpen(true);
-                }}>
-                  Editar
-                </button>
-
-                <button onClick={() => deleteCountry(c.id)}>
-                  Eliminar
-                </button>
-              </td>
+      {isLoading ? (
+        <p className="text-sm text-gray-500">Cargando...</p>
+      ) : (
+        <Table>
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-2 text-left">ISO</th>
+              <th className="p-2 text-left">Nombre</th>
+              <th className="p-2 text-right">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {data.map((country) => (
+              <tr key={country.id} className="border-t">
+                <td className="p-2">{country.iso}</td>
+                <td className="p-2">{country.name}</td>
+                <td className="p-2 text-right">
+                  <button
+                    onClick={() => {
+                      setEditing(country);
+                      setOpen(true);
+                    }}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
 
       <CountryFormModal
         open={open}
+        country={editing}
         onClose={() => {
           setOpen(false);
           setEditing(null);
         }}
-        onSubmit={handleSubmit}
-        initialData={editing}
       />
-    </>
+    </Card>
   );
 }
