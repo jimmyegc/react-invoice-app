@@ -40,7 +40,7 @@ export function StatesPage() {
             {data.map((state) => (
               <tr key={state.id} className="border-t">                
                 <td className="p-2">{state.id}-{state.name}</td>
-                <td className="p-2">{state.country?.name}</td>
+                <td className="p-2">{state.country?.[0]?.name}</td>
                 <td className="p-2 text-right">
                   <button
                     className="text-sm text-blue-600 hover:underline"

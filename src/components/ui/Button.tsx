@@ -1,5 +1,5 @@
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   loading?: boolean;
 };
 
@@ -18,6 +18,7 @@ export function Button({
     primary: 'bg-gray-900 text-white hover:bg-gray-800',
     secondary: 'border border-gray-300 bg-white hover:bg-gray-50',
     danger: 'bg-red-600 text-white hover:bg-red-500',
+    ghost: 'bg-transparent hover:bg-gray-100',
   };
 
   return (

@@ -1,13 +1,25 @@
-type CardProps = {
+import type { HTMLAttributes, ReactNode } from 'react';
+
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;
   description?: string;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-};
+  children: ReactNode;
+  footer?: ReactNode;
+}
 
-export function Card({ title, description, children, footer }: CardProps) {
+export function Card({
+  className,
+  title,
+  description,
+  children,
+  footer,
+  ...props
+}: CardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+    <div
+      className={`bg-white rounded-xl shadow-sm border border-gray-200 ${className ?? ''}`}
+      {...props}
+    >
       {(title || description) && (
         <div className="px-6 pt-6 pb-4 border-b">
           {title && (

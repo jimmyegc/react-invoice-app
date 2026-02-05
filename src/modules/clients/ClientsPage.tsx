@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ClientsTable } from './ClientsTable';
 import { ClientFormModal } from './ClientFormModal';
-import { Client } from './clients.types';
+import type { Client } from './clients.types';
 
 export function ClientsPage() {
   const [open, setOpen] = useState(false);

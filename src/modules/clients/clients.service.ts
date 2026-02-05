@@ -1,5 +1,5 @@
 import { supabase } from '@/app/supabase';
-import { Client, ClientFormData } from './clients.types';
+import type { Client, ClientFormData } from './clients.types';
 
 export async function getClients(search = '') {
   let query = supabase

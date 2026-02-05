@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getClients, deleteClient } from './clients.service';
-import { Client } from './clients.types';
+import type { Client } from './clients.types';
 import { Table } from '@/components/ui/Table';
 
 export function ClientsTable({

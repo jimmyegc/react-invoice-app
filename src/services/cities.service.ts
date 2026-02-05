@@ -9,8 +9,8 @@ export type CityRow = {
     country: {
       id: number;
       name: string;
-    };
-  };
+    }[];
+  }[];
 };
 
 export const getCitiesByState = async (stateId: number) => {
@@ -23,17 +23,16 @@ export const getCitiesByState = async (stateId: number) => {
   if (error) throw error;
   return data;
 };
-
 export const getAllCities = async (): Promise<CityRow[]> => {
   const { data, error } = await supabase
     .from('mvp_cities')
     .select(`
       id,
       name,
-      state:mvp_states (
+      state:mvp_states!inner (
         id,
         name,
-        country:mvp_countries (
+        country:mvp_countries!inner (
           id,
           name
         )
@@ -42,8 +41,9 @@ export const getAllCities = async (): Promise<CityRow[]> => {
     .order('name');
 
   if (error) throw error;
-  return data as CityRow[];
+  return data ?? [];
 };
+
 
 export const createCity = async (payload: {
   name: string;

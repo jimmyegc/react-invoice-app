@@ -37,8 +37,8 @@ export function CitiesAdminPage() {
             {data.map((city) => (
               <tr key={city.id} className="border-t">
                 <td className="p-2">{city.name}</td>
-                <td className="p-2">{city.state.name}</td>
-                <td className="p-2">{city.state.country.name}</td>
+                <td className="p-2">{city.state[0].name}</td>
+                <td className="p-2">{city.state[0].country[0].name}</td>
                 <td className="p-2 text-right space-x-2">
                   <button
                     className="text-sm text-blue-600 hover:underline"

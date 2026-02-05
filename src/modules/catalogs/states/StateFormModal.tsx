@@ -4,6 +4,7 @@ import { Button, Card, Select, Input } from '@/components/ui';
 import { useCountries } from '@/hooks/useCountries'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/app/supabase';
+import type { StateEntity, StateFormValues } from './states.types';
 
 type Props = {
   open: boolean;
@@ -23,7 +24,7 @@ export function StateFormModal({ open, state, onClose }: Props) {
   } = useForm<StateFormValues>({
     defaultValues: {
       name: '',
-      country_id: undefined,
+      countryId: undefined,
     },
   });
 
@@ -33,12 +34,12 @@ export function StateFormModal({ open, state, onClose }: Props) {
       if (state) {        
         reset({
           name: state.name,
-          country_id: state.country.id,
+          countryId: state.country.id,
         });
       } else {
         reset({
           name: '',
-          country_id: undefined,
+          countryId: undefined,
         });
       }
     }
@@ -87,7 +88,7 @@ export function StateFormModal({ open, state, onClose }: Props) {
 
           <Select
             key={`country-${state?.country.id ?? 'new'}`}
-            {...register('country_id', { required: true, valueAsNumber: true })}
+            {...register('countryId', { required: true, valueAsNumber: true })}
           >
             <option value="">Selecciona país</option>
             {countries?.map((c) => (

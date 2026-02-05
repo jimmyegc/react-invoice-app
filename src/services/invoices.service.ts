@@ -39,7 +39,7 @@ export async function createInvoice(payload: {
   const { data: invoice, error } = await supabase
     .from('mvp_invoices')
     .insert({
-      user_id: user.id,
+      user_id: user?.id,
       client_id: payload.client_id,
       issue_date: payload.issue_date,
       subtotal: payload.subtotal,

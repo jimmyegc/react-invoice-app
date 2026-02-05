@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient, updateClient } from './clients.service';
-import { Client } from './clients.types';
+import type { Client } from './clients.types';
 
 type Props = {
   open: boolean;
