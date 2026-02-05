@@ -2,11 +2,14 @@ import { Card, Button, Table } from '@/components/ui';
 import { useCountries } from '@/hooks/useCountries';
 import { useState } from 'react';
 import { CountryFormModal } from './CountryFormModal';
+import { deleteCountry } from '@/services/countries.service';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function CountriesPage() {
-  const { data = [], isLoading } = useCountries();
+  const { countries, isLoading } = useCountries();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   return (
     <Card>
@@ -27,10 +30,9 @@ export function CountriesPage() {
               <th className="p-2 text-left">Nombre</th>
               <th className="p-2 text-right">Acciones</th>
             </tr>
-          </thead>
-
+          </thead>          
           <tbody>
-            {data.map((country) => (
+            {countries.map((country) => (
               <tr key={country.id} className="border-t">
                 <td className="p-2">{country.iso}</td>
                 <td className="p-2">{country.name}</td>
@@ -43,6 +45,15 @@ export function CountriesPage() {
                     className="text-sm text-blue-600 hover:underline"
                   >
                     Editar
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await deleteCountry(country.id)
+                      queryClient.invalidateQueries({ queryKey: ['countries'] });
+                    }}
+                    className="text-sm text-red-600 hover:underline ml-3"
+                  >
+                    Eliminar
                   </button>
                 </td>
               </tr>

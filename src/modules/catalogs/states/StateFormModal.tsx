@@ -1,71 +1,68 @@
-// modules/catalogs/states/StateFormModal.tsx
-import { useEffect, useState } from 'react';
-import { useCountries } from '../countries/useCountries';
-import { Button, Card } from '@/components/ui';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
+import { Button, Card, Select, Input } from '@/components/ui';
+import { useCountries } from '@/hooks/useCountries'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/app/supabase';
 
 type Props = {
   open: boolean;
+  state?: StateEntity | null;
   onClose: () => void;
-  onSubmit: (data: { name: string; country_id: number }) => void;
-  initialData?: { name: string; country_id: number };
 };
 
-export function StateFormModal({
-  open,
-  onClose,
-  onSubmit,
-  initialData,
-}: Props) {
-
-  const { getCountries } = useCountries();
-  const [countries, setCountries] = useState<any[]>([]);
-  const [name, setName] = useState('');
-  const [countryId, setCountryId] = useState<number | ''>('');
+export function StateFormModal({ open, state, onClose }: Props) {
+  const queryClient = useQueryClient();
+  const { countries } = useCountries();
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<StateFormValues>({
     defaultValues: {
-      iso: '',
       name: '',
+      country_id: undefined,
     },
   });
 
+  // 🔑 Sincroniza editar / crear
   useEffect(() => {
-    getCountries().then(setCountries);
-  }, []);
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name);
-      setCountryId(initialData.country_id);
+    if (open) {
+      if (state) {        
+        reset({
+          name: state.name,
+          country_id: state.country.id,
+        });
+      } else {
+        reset({
+          name: '',
+          country_id: undefined,
+        });
+      }
     }
-  }, [initialData]);
+  }, [state, open, reset]);
 
-    const mutation = useMutation({
-    mutationFn: async (form: FormValues) => {
-      if (country) {
+  const mutation = useMutation({
+    mutationFn: async (form: StateFormValues) => {
+      if (state) {
         const { error } = await supabase
-          .from('mvp_countries')
+          .from('mvp_states')
           .update(form)
-          .eq('id', country.id);
+          .eq('id', state.id);
 
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from('mvp_countries')
+          .from('mvp_states')
           .insert(form);
 
         if (error) throw error;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['countries'] });
+      queryClient.invalidateQueries({ queryKey: ['states'] });
       onClose();
     },
   });
@@ -75,49 +72,43 @@ export function StateFormModal({
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
       <Card className="w-full max-w-md p-6">
-      <h2 className="font-semibold mb-4">{initialData ? 'Editar estado' : 'Nuevo estado'}</h2>
-      <form className="space-y-3">
-      <input
-        placeholder="Nombre del estado"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+        <h2 className="font-semibold mb-4">
+          {state ? 'Editar estado' : 'Nuevo estado'}
+        </h2>
 
-      <select
-        value={countryId}
-        onChange={(e) => setCountryId(Number(e.target.value))}
-      >
-        <option value="">Selecciona país</option>
-        {countries.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
+        <form
+          onSubmit={handleSubmit((data) => mutation.mutate(data))}
+          className="space-y-3"
+        >
+          <Input
+            {...register('name', { required: true })}
+            placeholder="Nombre del estado"
+          />
 
-      <div className='flex justify-end gap-2'>
-        <Button type='button' variant="ghost" onClick={onClose}>
-          Cancelar
-        </Button>
-        <Button type="submit" loading={isSubmitting || mutation.isPending}>
-          Guardar
-        </Button>
-      </div>
+          <Select
+            key={`country-${state?.country.id ?? 'new'}`}
+            {...register('country_id', { required: true, valueAsNumber: true })}
+          >
+            <option value="">Selecciona país</option>
+            {countries?.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </Select>
 
-      <button
-        onClick={() =>
-          onSubmit({
-            name,
-            country_id: Number(countryId),
-          })
-        }
-        disabled={!name || !countryId}
-      >
-        Guardar
-      </button>
-
-      <button onClick={onClose}>Cancelar</button>
-      </form>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              loading={isSubmitting || mutation.isPending || undefined}
+            >
+              Guardar
+            </Button>
+          </div>
+        </form>
       </Card>
     </div>
   );

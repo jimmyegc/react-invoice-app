@@ -2,17 +2,25 @@ import { Card, Button, Table } from '@/components/ui';
 import { useStates } from '@/hooks/useStates';
 import { useState } from 'react';
 import { StateFormModal } from './StateFormModal';
+import { deleteState } from '@/services/states.service'
+import { useQueryClient } from '@tanstack/react-query';
 
 export function StatesPage() {
   const { data = [], isLoading } = useStates();
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<any>(null);
+  const [editing, setEditing] = useState<any | null>(null);
+  const queryClient = useQueryClient();
 
   return (
     <Card>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-lg font-semibold">Estados</h1>
-        <Button onClick={() => setOpen(true)}>
+        <Button
+          onClick={() => {
+            setEditing(null);
+            setOpen(true);
+          }}
+        >
           Nuevo estado
         </Button>
       </div>
@@ -28,22 +36,31 @@ export function StatesPage() {
               <th className="p-2 text-right">Acciones</th>
             </tr>
           </thead>
-
           <tbody>
             {data.map((state) => (
-              <tr key={state.id} className="border-t">
-                <td className="p-2">{state.name}</td>
+              <tr key={state.id} className="border-t">                
+                <td className="p-2">{state.id}-{state.name}</td>
                 <td className="p-2">{state.country?.name}</td>
                 <td className="p-2 text-right">
                   <button
+                    className="text-sm text-blue-600 hover:underline"
                     onClick={() => {
                       setEditing(state);
                       setOpen(true);
                     }}
-                    className="text-sm text-blue-600 hover:underline"
                   >
                     Editar
                   </button>
+                  <button
+                    onClick={async () => {
+                      await deleteState(state.id)
+                      queryClient.invalidateQueries({ queryKey: ['states'] });
+                    }}
+                    className="text-sm text-red-600 hover:underline ml-3"
+                  >
+                    Eliminar
+                  </button>
+
                 </td>
               </tr>
             ))}
@@ -52,6 +69,7 @@ export function StatesPage() {
       )}
 
       <StateFormModal
+        key={editing?.id ?? 'new'}   // 🔥 mata estado interno
         open={open}
         state={editing}
         onClose={() => {

@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react';
-import { createCity, updateCity } from '@/services/cities.service';
+// modules/cities/CityFormModal.tsx
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCountries } from '@/services/countries.service';
 import { getStatesByCountry } from '@/services/states.service';
+import { createCity, updateCity } from '@/services/cities.service';
 import { Card, Button, Input, Select } from '@/components/ui';
 
-type City = {
-  id: number;
+type FormValues = {
   name: string;
-  state_id: number;
+  country_id?: number;
+  state_id?: number;
 };
 
 export function CityFormModal({
@@ -16,60 +19,99 @@ export function CityFormModal({
   onClose,
 }: {
   open: boolean;
-  city?: City | null;
+  city?: any | null;
   onClose: () => void;
 }) {
-  const [name, setName] = useState('');
-  const [countryId, setCountryId] = useState<number | null>(null);
-  const [stateId, setStateId] = useState<number | null>(null);
+  const queryClient = useQueryClient();
 
-  const [countries, setCountries] = useState<any[]>([]);
-  const [states, setStates] = useState<any[]>([]);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    setValue,
+  } = useForm<FormValues>({
+    defaultValues: {
+      name: '',
+      country_id: undefined,
+      state_id: undefined,
+    },
+  });
 
-  // cargar países
+  const countryId = watch('country_id');
+
+  /* =========================
+     Queries
+  ========================= */
+
+  const { data: countries = [] } = useQuery({
+    queryKey: ['countries'],
+    queryFn: getCountries,
+  });
+
+  const { data: states = [] } = useQuery({
+    queryKey: ['states', countryId],
+    queryFn: () => getStatesByCountry(countryId!),
+    enabled: !!countryId,
+  });
+
+  /* =========================
+     Mutación
+  ========================= */
+
+  const mutation = useMutation({
+    mutationFn: async (data: FormValues) => {
+      if (!data.state_id) return;
+
+      if (city) {
+        await updateCity(city.id, {
+          name: data.name,
+          state_id: data.state_id,
+        });
+      } else {
+        await createCity({
+          name: data.name,
+          state_id: data.state_id,
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cities'] });
+      onClose();
+    },
+  });
+
+  /* =========================
+     Edición / Creación
+  ========================= */
+
   useEffect(() => {
-    getCountries().then(setCountries);    
-  }, []);
-
-  // cuando cambia país → cargar estados
-  useEffect(() => {
-    if (countryId) {
-      getStatesByCountry(countryId).then(setStates);
-    } else {
-      setStates([]);
-    }
-  }, [countryId]);
-
-  // modo edición
-  useEffect(() => {
-    if (!city) return;
-    console.log(city)
-    setName(city.name);
-    setStateId(city.state_id);
-
-    // inferir country desde state
-    getStatesByCountry(undefined as any).then(() => {}); // noop visual
-  }, [city]);
-
-  if (!open) return null;
-
-  const submit = async () => {
-    if (!name || !stateId) return;
+    if (!open) return;
 
     if (city) {
-      await updateCity(city.id, {
-        name,
-        state_id: stateId,
+      reset({
+        name: city.name,
+        country_id: city.state.country.id,
+        state_id: city.state.id,
       });
     } else {
-      await createCity({
-        name,
-        state_id: stateId,
+      reset({
+        name: '',
+        country_id: undefined,
+        state_id: undefined,
       });
     }
+  }, [city, open, reset]);
 
-    onClose();
-  };
+  /* =========================
+     Cambio de país
+  ========================= */
+
+  useEffect(() => {
+    setValue('state_id', undefined);
+  }, [countryId, setValue]);
+
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
@@ -77,45 +119,51 @@ export function CityFormModal({
         <h2 className="text-lg font-semibold">
           {city ? 'Editar ciudad' : 'Nueva ciudad'}
         </h2>
-
-        <Select
-          value={countryId ?? ''}
-          onChange={(e) => setCountryId(Number(e.target.value))}
+        <form
+          onSubmit={handleSubmit((data) => mutation.mutate(data))}
+          className="space-y-3"
         >
-          <option value="">País</option>
-          {countries.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
-        <Select
-          value={stateId ?? ''}
-          onChange={(e) => setStateId(Number(e.target.value))}
-          disabled={!countryId}
-        >
-          <option value="">Estado</option>
-          {states.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </Select>
+          {/* 🔑 FORZAMOS RESET DEL SELECT */}
+          <Select
+            key={`country-${city?.id ?? 'new'}`}
+            {...register('country_id', { valueAsNumber: true })}
+          >
+            <option value="">País</option>
+            {countries.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </Select>
 
-        <Input
-          placeholder="Nombre de la ciudad"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+          {/* 🔑 DEPENDE DEL PAÍS */}
+          <Select
+            key={`state-${countryId ?? 'none'}`}
+            {...register('state_id', { valueAsNumber: true })}
+            disabled={!countryId}
+          >
+            <option value="">Estado</option>
+            {states.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </Select>
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button variant="ghost" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button onClick={submit}>
-            Guardar
-          </Button>
-        </div>
+          <Input
+            placeholder="Nombre de la ciudad"
+            {...register('name', { required: true })}
+          />
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="ghost" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="submit" loading={mutation.isPending}>
+              Guardar
+            </Button>
+          </div>
+        </form>
       </Card>
     </div>
   );

@@ -1,21 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import {  getStatesByCountry } from '@/services/states.service'
+import {  getAllStates, getStatesByCountry } from '@/services/states.service'
 
 export function useStates (){
   return useQuery({
     queryKey: ['states'],
-    queryFn: getStatesByCountry
+    queryFn: getAllStates
   })
 }
 
-/*
-import { useQuery } from '@tanstack/react-query';
-import { getCountries } from '@/services/countries.service';
-
-export function useCountries() {
+export function useStatesByCountry(countryId?: number) {
   return useQuery({
-    queryKey: ['countries'],
-    queryFn: getCountries,
+    queryKey: ['states', countryId],
+    queryFn: () => getStatesByCountry(countryId!),
+    enabled: !!countryId,
   });
 }
-*/

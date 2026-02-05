@@ -1,10 +1,14 @@
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'danger';
+  loading?: boolean;
 };
 
 export function Button({
   variant = 'primary',
   className = '',
+  loading,
+  disabled,
+  children,
   ...props
 }: ButtonProps) {
   const base =
@@ -19,7 +23,10 @@ export function Button({
   return (
     <button
       className={`${base} ${variants[variant]} ${className}`}
+      disabled={loading || disabled}
       {...props}
-    />
+    >
+      {loading ? 'Cargando…' : children}
+    </button>
   );
 }

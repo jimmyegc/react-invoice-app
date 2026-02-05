@@ -1,5 +1,18 @@
 import { supabase } from '@/app/supabase';
 
+export type CityRow = {
+  id: number;
+  name: string;
+  state: {
+    id: number;
+    name: string;
+    country: {
+      id: number;
+      name: string;
+    };
+  };
+};
+
 export const getCitiesByState = async (stateId: number) => {
   const { data, error } = await supabase
     .from('mvp_cities')
@@ -11,15 +24,25 @@ export const getCitiesByState = async (stateId: number) => {
   return data;
 };
 
-
-export const getAllCities = async () => {
+export const getAllCities = async (): Promise<CityRow[]> => {
   const { data, error } = await supabase
     .from('mvp_cities')
-    .select('id, name, state_id, state:mvp_states(name)')
+    .select(`
+      id,
+      name,
+      state:mvp_states (
+        id,
+        name,
+        country:mvp_countries (
+          id,
+          name
+        )
+      )
+    `)
     .order('name');
 
   if (error) throw error;
-  return data;
+  return data as CityRow[];
 };
 
 export const createCity = async (payload: {
@@ -53,3 +76,4 @@ export const deleteCity = async (id: number) => {
 
   if (error) throw error;
 };
+

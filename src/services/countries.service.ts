@@ -9,3 +9,12 @@ export const getCountries = async () => {
   if (error) throw error;
   return data;
 };
+
+export const deleteCountry = async (id: number) => {
+  const { error } = await supabase
+    .from('mvp_countries')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+};
