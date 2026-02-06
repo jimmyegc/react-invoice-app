@@ -9,7 +9,7 @@ export function ClientsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Clientes</h1>
 
         <button

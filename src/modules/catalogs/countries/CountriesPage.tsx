@@ -32,6 +32,7 @@ export function CountriesPage() {
             </tr>
           </thead>          
           <tbody>
+     
             {countries.map((country) => (
               <tr key={country.id} className="border-t">
                 <td className="p-2">{country.iso}</td>

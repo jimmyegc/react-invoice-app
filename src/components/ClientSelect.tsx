@@ -8,7 +8,7 @@ type Props = {
 
 export function ClientSelect({ value, onChange }: Props) {
   const [clients, setClients] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getClients()
@@ -16,7 +16,7 @@ export function ClientSelect({ value, onChange }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Cargando clientes...</p>;
+  if (!loading) return <p>Cargando clientes...</p>;
 
   return (
     <select

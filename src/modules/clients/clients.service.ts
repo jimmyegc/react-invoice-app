@@ -3,7 +3,7 @@ import type { Client, ClientFormData } from './clients.types';
 
 export async function getClients(search = '') {
   let query = supabase
-    .from('mvp_clients')
+    .from('mvp_clients_view')
     .select('*')
     .order('created_at', { ascending: false });
 
@@ -12,7 +12,8 @@ export async function getClients(search = '') {
   }
 
   const { data, error } = await query;
-
+  //console.log(data)
+  
   if (error) throw error;
   return data as Client[];
 }

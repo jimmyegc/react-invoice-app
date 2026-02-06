@@ -1,7 +1,6 @@
-// modules/catalogs/countries/useCountries.ts
-import { supabase } from '@/app/supabase';
 
 export function useCountries() {
+  
   const getCountries = async () => {
     const { data, error } = await supabase
       .from('mvp_countries')
@@ -9,6 +8,7 @@ export function useCountries() {
       .order('name');
 
     if (error) throw error;    
+    console.log("getCountries", data)
     return data;
   };
 

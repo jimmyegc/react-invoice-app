@@ -38,9 +38,9 @@ export function StatesPage() {
           </thead>
           <tbody>
             {data.map((state) => (
-              <tr key={state.id} className="border-t">                
-                <td className="p-2">{state.id}-{state.name}</td>
-                <td className="p-2">{state.country?.[0]?.name}</td>
+              <tr key={state.state_id} className="border-t">                              
+                <td className="p-2">{state.state_name}</td>                
+                <td className="p-2">{state.country_name}</td>
                 <td className="p-2 text-right">
                   <button
                     className="text-sm text-blue-600 hover:underline"
@@ -53,7 +53,7 @@ export function StatesPage() {
                   </button>
                   <button
                     onClick={async () => {
-                      await deleteState(state.id)
+                      await deleteState(state.state_id)
                       queryClient.invalidateQueries({ queryKey: ['states'] });
                     }}
                     className="text-sm text-red-600 hover:underline ml-3"

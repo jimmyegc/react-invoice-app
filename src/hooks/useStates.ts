@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import {  getAllStates, getStatesByCountry } from '@/services/states.service'
+import {  getStates, getStatesByCountry } from '@/services/states.service'
 
 export function useStates (){
   return useQuery({
     queryKey: ['states'],
-    queryFn: getAllStates
+    queryFn: getStates
   })
 }
 

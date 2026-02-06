@@ -9,5 +9,5 @@ export interface StateEntity {
 
 export interface StateFormValues {
   name: string;
-  countryId: number;
+  country_id: number;
 }

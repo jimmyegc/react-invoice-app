@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient, updateClient } from './clients.service';
-import type { Client } from './clients.types';
+import type { Client, ClientFormData } from './clients.types';
+
+import { useCountries } from '@/hooks/useCountries';
+import { useStates } from '@/hooks/useStates';
+import { useCities } from '@/hooks/useCities';
 
 type Props = {
   open: boolean;
@@ -9,28 +13,25 @@ type Props = {
   onClose: () => void;
 };
 
-type FormData = {
-  name: string;
-  business_name?: string;
-  rfc?: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-};
-
 export function ClientFormModal({ open, client, onClose }: Props) {
   const queryClient = useQueryClient();
 
-  const [form, setForm] = useState<FormData>({
+  const [form, setForm] = useState<ClientFormData>({
     name: '',
     business_name: '',
     rfc: '',
     address: '',
     phone: '',
     email: '',
+    country_id: null,
+    state_id: null,
+    city_id: null,
   });
 
-  // 👉 cuando es editar, llenamos el form
+  const { data: countries = [] } = useCountries();
+  const { data: states = [] } = useStates(form.country_id);
+  const { data: cities = [] } = useCities(form.state_id);
+
   useEffect(() => {
     if (client) {
       setForm({
@@ -40,6 +41,9 @@ export function ClientFormModal({ open, client, onClose }: Props) {
         address: client.address ?? '',
         phone: client.phone ?? '',
         email: client.email ?? '',
+        country_id: client.country_id ?? null,
+        state_id: client.state_id ?? null,
+        city_id: client.city_id ?? null,
       });
     } else {
       setForm({
@@ -49,12 +53,15 @@ export function ClientFormModal({ open, client, onClose }: Props) {
         address: '',
         phone: '',
         email: '',
+        country_id: null,
+        state_id: null,
+        city_id: null,
       });
     }
   }, [client]);
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) =>
+    mutationFn: (data: ClientFormData) =>
       client ? updateClient(client.id, data) : createClient(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
@@ -83,9 +90,7 @@ export function ClientFormModal({ open, client, onClose }: Props) {
             placeholder="Nombre *"
             required
             value={form.name}
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
 
           <input
@@ -97,40 +102,69 @@ export function ClientFormModal({ open, client, onClose }: Props) {
             }
           />
 
-          <input
+          <select
             className="border px-3 py-2 rounded w-full"
-            placeholder="RFC"
-            value={form.rfc}
+            value={form.country_id ?? ''}
             onChange={(e) =>
-              setForm({ ...form, rfc: e.target.value })
+              setForm({
+                ...form,
+                country_id: Number(e.target.value),
+                state_id: null,
+                city_id: null,
+              })
             }
-          />
+          >
+            <option value="">País</option>
+            {JSON.stringify(countries)}
+            {countries.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="border px-3 py-2 rounded w-full"
+            value={form.state_id ?? ''}
+            disabled={!form.country_id}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                state_id: Number(e.target.value),
+                city_id: null,
+              })
+            }
+          >
+            <option value="">Estado</option>
+            {states.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="border px-3 py-2 rounded w-full"
+            value={form.city_id ?? ''}
+            disabled={!form.state_id}
+            onChange={(e) =>
+              setForm({ ...form, city_id: Number(e.target.value) })
+            }
+          >
+            <option value="">Ciudad</option>
+            {cities.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
 
           <input
             className="border px-3 py-2 rounded w-full"
-            placeholder="Dirección"
+            placeholder="Dirección (calle, número)"
             value={form.address}
             onChange={(e) =>
               setForm({ ...form, address: e.target.value })
-            }
-          />
-
-          <input
-            className="border px-3 py-2 rounded w-full"
-            placeholder="Teléfono"
-            value={form.phone}
-            onChange={(e) =>
-              setForm({ ...form, phone: e.target.value })
-            }
-          />
-
-          <input
-            type="email"
-            className="border px-3 py-2 rounded w-full"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
             }
           />
 
@@ -148,9 +182,7 @@ export function ClientFormModal({ open, client, onClose }: Props) {
               disabled={mutation.isPending}
               className="px-4 py-2 text-sm bg-gray-900 text-white rounded"
             >
-              {mutation.isPending
-                ? 'Guardando...'
-                : 'Guardar'}
+              {mutation.isPending ? 'Guardando...' : 'Guardar'}
             </button>
           </div>
         </form>

@@ -1,62 +1,79 @@
-import { useEffect, useState } from 'react';
-import { getCountries } from '@/services/countries.service';
-import { getStatesByCountry } from '@/services/states.service';
-import { getCitiesByState } from '@/services/cities.service';
+import { Card, Button, Table } from '@/components/ui';
+import { useCities } from '@/hooks/useCities';
+import { useState } from 'react';
+import { CityFormModal } from './CityFormModal';
+import { deleteCity } from '@/services/cities.service';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function CitiesPage() {
-  const [countries, setCountries] = useState<any[]>([]);
-  const [states, setStates] = useState<any[]>([]);
-  const [cities, setCities] = useState<any[]>([]);
-
-  const [countryId, setCountryId] = useState<number | null>(null);
-  const [stateId, setStateId] = useState<number | null>(null);
-
-  useEffect(() => {
-    getCountries().then(setCountries);
-  }, []);
-
-  useEffect(() => {
-    if (countryId) {
-      setStateId(null);
-      setCities([]);
-      getStatesByCountry(countryId).then(setStates);
-    }
-  }, [countryId]);
-
-  useEffect(() => {
-    if (stateId) {
-      getCitiesByState(stateId).then(setCities);
-    }
-  }, [stateId]);
+  const { data = [], isLoading } = useCities();
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   return (
-    <div>
-      <h1>Cities</h1>
+    <Card>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-lg font-semibold">Ciudades</h1>
+        <Button onClick={() => { setEditing(null); setOpen(true); }}>
+          Nueva ciudad
+        </Button>
+      </div>
 
-      {/* Country */}
-      <select onChange={(e) => setCountryId(Number(e.target.value))}>
-        <option value="">Select country</option>
-        {countries.map(c => (
-          <option key={c.id} value={c.id}>{c.name}</option>
-        ))}
-      </select>
-
-      {/* State */}
-      {countryId && (
-        <select onChange={(e) => setStateId(Number(e.target.value))}>
-          <option value="">Select state</option>
-          {states.map(s => (
-            <option key={s.id} value={s.id}>{s.name}</option>
-          ))}
-        </select>
+      {isLoading ? (
+        <p className="text-sm text-gray-500">Cargando…</p>
+      ) : (
+        <Table>
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-2 text-left">Ciudad</th>
+              <th className="p-2 text-left">Estado</th>
+              <th className="p-2 text-left">País</th>
+              <th className="p-2 text-right">Acciones</th>
+            </tr>
+          </thead>
+                
+          <tbody>
+            {data.map((city) => (
+              <tr key={city.city_id} className="border-t">                
+                <td className="p-2">{city.city_name}</td>
+                <td className="p-2">{city.state_name}</td>
+                <td className="p-2">{city.country_name}</td>
+                <td className="p-2 text-right space-x-2">
+                  <button
+                    className="text-sm text-blue-600 hover:underline"
+                    onClick={() => {
+                      setEditing(city);
+                      setOpen(true);
+                    }}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="text-sm text-red-600 hover:underline"
+                    onClick={async () => {
+                      await deleteCity(city.city_id);
+                      queryClient.invalidateQueries({ queryKey: ['cities'] });
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
 
-      {/* Cities */}
-      <ul>
-        {cities.map(city => (
-          <li key={city.id}>{city.name}</li>
-        ))}
-      </ul>
-    </div>
+      <CityFormModal
+        key={editing?.id ?? 'new'}
+        open={open}
+        city={editing}
+        onClose={() => {
+          setOpen(false);
+          setEditing(null);
+        }}
+      />
+    </Card>
   );
 }

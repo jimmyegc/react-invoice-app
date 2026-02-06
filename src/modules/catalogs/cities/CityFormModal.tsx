@@ -23,6 +23,7 @@ export function CityFormModal({
   onClose: () => void;
 }) {
   const queryClient = useQueryClient();
+  const isEditing = !!city;
 
   const {
     register,
@@ -49,7 +50,7 @@ export function CityFormModal({
     queryFn: getCountries,
   });
 
-  const { data: states = [] } = useQuery({
+  const { data: states = [], isSuccess: statesLoaded } = useQuery({
     queryKey: ['states', countryId],
     queryFn: () => getStatesByCountry(countryId!),
     enabled: !!countryId,
@@ -63,8 +64,8 @@ export function CityFormModal({
     mutationFn: async (data: FormValues) => {
       if (!data.state_id) return;
 
-      if (city) {
-        await updateCity(city.id, {
+      if (isEditing) {
+        await updateCity(city.city_id, {
           name: data.name,
           state_id: data.state_id,
         });
@@ -82,17 +83,18 @@ export function CityFormModal({
   });
 
   /* =========================
-     Edición / Creación
+     Inicialización del form
   ========================= */
 
   useEffect(() => {
     if (!open) return;
 
-    if (city) {
+    if (isEditing) {
+      // 1️⃣ Seteamos nombre y país primero
       reset({
-        name: city.name,
-        country_id: city.state.country.id,
-        state_id: city.state.id,
+        name: city.city_name,
+        country_id: city.country_id,
+        state_id: undefined,
       });
     } else {
       reset({
@@ -101,15 +103,35 @@ export function CityFormModal({
         state_id: undefined,
       });
     }
-  }, [city, open, reset]);
+  }, [open, city, isEditing, reset]);
 
   /* =========================
-     Cambio de país
+     Setear estado SOLO cuando
+     los states ya cargaron
   ========================= */
 
   useEffect(() => {
-    setValue('state_id', undefined);
-  }, [countryId, setValue]);
+    if (!isEditing) return;
+    if (!statesLoaded) return;
+
+    const exists = states.some(
+      (s) => s.id === city.state_id
+    );
+
+    if (exists) {
+      setValue('state_id', city.state_id);
+    }
+  }, [isEditing, statesLoaded, states, city, setValue]);
+
+  /* =========================
+     Cambio de país (crear)
+  ========================= */
+
+  useEffect(() => {
+    if (!isEditing) {
+      setValue('state_id', undefined);
+    }
+  }, [countryId, isEditing, setValue]);
 
   if (!open) return null;
 
@@ -117,15 +139,15 @@ export function CityFormModal({
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
       <Card className="w-full max-w-md space-y-4">
         <h2 className="text-lg font-semibold">
-          {city ? 'Editar ciudad' : 'Nueva ciudad'}
+          {isEditing ? 'Editar ciudad' : 'Nueva ciudad'}
         </h2>
+
         <form
           onSubmit={handleSubmit((data) => mutation.mutate(data))}
           className="space-y-3"
         >
-          {/* 🔑 FORZAMOS RESET DEL SELECT */}
+          {/* País */}
           <Select
-            key={`country-${city?.id ?? 'new'}`}
             {...register('country_id', { valueAsNumber: true })}
           >
             <option value="">País</option>
@@ -136,9 +158,8 @@ export function CityFormModal({
             ))}
           </Select>
 
-          {/* 🔑 DEPENDE DEL PAÍS */}
+          {/* Estado */}
           <Select
-            key={`state-${countryId ?? 'none'}`}
             {...register('state_id', { valueAsNumber: true })}
             disabled={!countryId}
           >

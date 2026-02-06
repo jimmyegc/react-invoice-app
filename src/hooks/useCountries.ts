@@ -1,29 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/app/supabase';
-
-type Country = {
-  id: number;
-  name: string;
-  iso: string;
-};
-
-/* =========================
-   QUERIES
-========================= */
-
-const fetchCountries = async (): Promise<Country[]> => {
-  const { data, error } = await supabase
-    .from('mvp_countries')
-    .select('*')
-    .order('name');
-
-  if (error) throw error;  
-  return data ?? [];
-};
-
-/* =========================
-   HOOK
-========================= */
+import { getCountries } from '@/services/countries.service';
 
 export function useCountries() {
   const queryClient = useQueryClient();
@@ -31,7 +8,7 @@ export function useCountries() {
   /* -------- GET -------- */
   const countriesQuery = useQuery({
     queryKey: ['countries'],
-    queryFn: fetchCountries,
+    queryFn: getCountries,
   });
 
   /* -------- CREATE -------- */

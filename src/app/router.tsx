@@ -9,7 +9,7 @@ import { LoginPage } from '@/modules/auth/LoginPage';
 import { SettingsPage } from '@/modules/settings/SettingsPage';
 import { StatesPage } from '@/modules/catalogs/states/StatesPage';
 import { CountriesPage } from '@/modules/catalogs/countries/CountriesPage';
-import { CitiesAdminPage } from '@/modules/catalogs/cities/CitiesAdminPage';
+import { CitiesPage } from '@/modules/catalogs/cities/CitiesPage';
 import { InvoicesPage } from '@/modules/invoices/InvoicesPage';
 import { InvoiceFormPage } from '@/modules/invoices/InvoiceFormPage';
 import { InvoiceEditPage } from '@/modules/invoices/InvoiceEditPage';
@@ -30,9 +30,9 @@ export const router = createBrowserRouter([
             element: <DashboardLayout />,
             children: [
               { path: '/', element: <ClientsPage /> },
-              { path: '/cities', element: <CitiesAdminPage/> },
-              { path: '/states', element: <StatesPage/> },
-              { path: '/countries', element: <CountriesPage/> },
+              { path: '/cities', element: <CitiesPage /> },
+              { path: '/states', element: <StatesPage /> },
+              { path: '/countries', element: <CountriesPage /> },
               { path: '/clients', element: <ClientsPage /> },    
               { path: '/invoices', element: <InvoicesPage/> },
               { path: '/invoices/new', element: <InvoiceFormPage/> },
