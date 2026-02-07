@@ -3,3 +3,6 @@ export { Input } from './Input';
 export { Select } from './Select';
 export { Card } from './Card';
 export { Table } from './Table';
+export { Modal } from './Modal';
+export { Spinner } from './Spinner'
+export { PageLoader } from './PageLoader'

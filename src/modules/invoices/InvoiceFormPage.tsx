@@ -1,4 +1,3 @@
-// modules/invoices/InvoiceFormPage.tsx
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/app/supabase';
 import { useState } from 'react';

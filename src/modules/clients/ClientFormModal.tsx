@@ -6,6 +6,7 @@ import type { Client, ClientFormData } from './clients.types';
 import { useCountries } from '@/hooks/useCountries';
 import { useStatesByCountry } from '@/hooks/useStates';
 import { useCitiesByState } from '@/hooks/useCities';
+import { Spinner } from '@/components/ui/Spinner';
 
 type Props = {
   open: boolean;
@@ -209,8 +210,9 @@ export function ClientFormModal({ open, client, onClose }: Props) {
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="px-4 py-2 text-sm bg-gray-900 text-white rounded"
+              className="flex gap-2 px-4 py-2 text-sm bg-gray-900 text-white rounded"
             >
+              {mutation.isPending && <Spinner size='sm' /> }              
               {mutation.isPending ? 'Guardando...' : 'Guardar'}
             </button>
           </div>

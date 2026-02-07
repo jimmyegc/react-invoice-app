@@ -67,7 +67,7 @@ export function InvoicesPage() {
                     Ver
                   </Button>
 
-                  {inv.status === 'draft' && (
+                  {(inv.status === 'draft' || inv.status === 'issued') && (
                     <Button
                       variant="ghost"
                       onClick={() =>

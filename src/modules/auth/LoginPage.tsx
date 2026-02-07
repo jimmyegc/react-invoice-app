@@ -1,23 +1,13 @@
-import { supabase } from '@/app/supabase';
+import { useAuth } from '@/hooks/useAuth'
 
 export function LoginPage() {
-  const loginWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-
-    if (error) {
-      console.error(error.message);
-    }
-  };
+  
+  const { loginWithGoogle } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8 space-y-6">
-        {/* Header */}
+
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-semibold text-gray-900">
             Bienvenido
@@ -27,7 +17,6 @@ export function LoginPage() {
           </p>
         </div>
 
-        {/* Actions */}
         <button
           onClick={loginWithGoogle}
           className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50 transition"
@@ -53,7 +42,6 @@ export function LoginPage() {
           Continuar con Google
         </button>
 
-        {/* Footer */}
         <p className="text-xs text-center text-gray-400">
           Al continuar aceptas nuestros términos y políticas de privacidad
         </p>

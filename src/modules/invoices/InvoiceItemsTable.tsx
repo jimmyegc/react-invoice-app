@@ -1,4 +1,3 @@
-// modules/invoices/InvoiceItemsTable.tsx
 import { Table, Button } from '@/components/ui';
 
 type Item = {

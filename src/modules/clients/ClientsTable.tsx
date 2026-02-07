@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getClients, deleteClient } from './clients.service';
 import type { Client } from './clients.types';
 import { Table } from '@/components/ui/Table';
+import { Card } from '@/components/ui';
 
 export function ClientsTable({
   search,
@@ -27,7 +28,7 @@ export function ClientsTable({
   if (isLoading) return <p>Cargando...</p>;
 
   return (
-    <>
+    <Card>
       <Table>
         <thead className="bg-gray-50 text-sm">
           <tr>
@@ -71,6 +72,6 @@ export function ClientsTable({
           ))}
         </tbody>
       </Table>
-    </>
+    </Card>
   );
 }

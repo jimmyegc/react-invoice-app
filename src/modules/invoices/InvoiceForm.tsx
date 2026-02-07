@@ -1,4 +1,3 @@
-// modules/invoices/InvoiceForm.tsx
 import { useEffect, useState } from 'react';
 import { supabase } from '@/app/supabase';
 import { Card, Button } from '@/components/ui';

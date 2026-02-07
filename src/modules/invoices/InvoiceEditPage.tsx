@@ -1,9 +1,9 @@
-// modules/invoices/InvoiceEditPage.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/app/supabase';
 import { Card, Button } from '@/components/ui';
 import { InvoiceForm } from './InvoiceForm';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 type InvoiceStatus = 'draft' | 'issued' | 'paid' | 'cancelled';
 
@@ -141,7 +141,7 @@ export function InvoiceEditPage() {
     navigate(`/invoices/${invoice.id}`);
   }
 
-  if (loading) return <p>Cargando factura…</p>;
+  if (loading) return <PageLoader/>;
   if (!invoice) return <p>Factura no encontrada</p>;
 
   return (

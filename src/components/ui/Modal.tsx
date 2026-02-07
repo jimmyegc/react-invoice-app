@@ -1,4 +1,3 @@
-// components/ui/Modal.tsx
 export function Modal({
   open,
   title,

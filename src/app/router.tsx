@@ -18,7 +18,6 @@ import { InvoicePrintPage } from '@/modules/invoices/InvoicePrintPage';
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
-
   {
     element: <ProtectedRoute />,
     children: [
