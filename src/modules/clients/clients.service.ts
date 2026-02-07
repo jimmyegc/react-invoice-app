@@ -12,9 +12,9 @@ export async function getClients(search = '') {
   }
 
   const { data, error } = await query;
-  //console.log(data)
-  
+    
   if (error) throw error;
+  
   return data as Client[];
 }
 

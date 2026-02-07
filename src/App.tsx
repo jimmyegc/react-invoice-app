@@ -3,9 +3,7 @@ import { router } from './app/router';
 import { SettingsProvider } from './modules/settings/SettingsContext';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
-function App() {
-  //console.log(import.meta.env.VITE_SUPABASE_URL);
-
+function App() {  
   return (
   <SettingsProvider>
     <RouterProvider router={router} />

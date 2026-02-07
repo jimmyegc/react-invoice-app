@@ -34,9 +34,9 @@ export function CountriesPage() {
           <tbody>
      
             {countries.map((country) => (
-              <tr key={country.id} className="border-t">
-                <td className="p-2">{country.iso}</td>
-                <td className="p-2">{country.name}</td>
+              <tr key={country.country_id} className="border-t">
+                <td className="p-2">{country.country_iso}</td>
+                <td className="p-2">{country.country_name}</td>
                 <td className="p-2 text-right">
                   <button
                     onClick={() => {
@@ -49,7 +49,7 @@ export function CountriesPage() {
                   </button>
                   <button
                     onClick={async () => {
-                      await deleteCountry(country.id)
+                      await deleteCountry(country.country_id)
                       queryClient.invalidateQueries({ queryKey: ['countries'] });
                     }}
                     className="text-sm text-red-600 hover:underline ml-3"

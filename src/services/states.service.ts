@@ -14,22 +14,25 @@ export type CreateStatePayload = {
 
 export const getStatesByCountry = async (countryId: number) => {
   const { data, error } = await supabase
-    .from('mvp_states')
-    .select('id, name')
+    .from('v_mvp_states')
+    .select('*')
     .eq('country_id', countryId) 
-    .order('name');
+    .order("country_name")
+    .order('state_name');
 
-  if (error) throw error;
+  if (error) throw error;  
   return data;
 };
 
 export async function getStates(): Promise<StateRow[]> {
   const { data, error } = await supabase
-    .from('v_mvp_states') // 👈 tu vista
+    .from('v_mvp_states')
     .select('*')
+    .order("country_name")
     .order('state_name');
 
-  if (error) throw error;
+  if (error) throw error;  
+  
   return data ?? [];
 }
 

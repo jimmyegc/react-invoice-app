@@ -8,7 +8,7 @@ export function useStates (){
   })
 }
 
-export function useStatesByCountry(countryId?: number) {
+export function useStatesByCountry(countryId?: number | null) {
   return useQuery({
     queryKey: ['states', countryId],
     queryFn: () => getStatesByCountry(countryId!),

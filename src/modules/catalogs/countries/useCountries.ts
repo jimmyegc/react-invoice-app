@@ -1,3 +1,4 @@
+import { supabase } from "@/app/supabase";
 
 export function useCountries() {
   
@@ -8,7 +9,7 @@ export function useCountries() {
       .order('name');
 
     if (error) throw error;    
-    console.log("getCountries", data)
+    
     return data;
   };
 

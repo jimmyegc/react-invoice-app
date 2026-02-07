@@ -1,15 +1,16 @@
 import { supabase } from '@/app/supabase';
-import { Country } from './countries.types';
+import type { CountryRow } from '@/types/countries';
 
-export const getCountries = async (): Promise<Country[]> => {
+export async function getCountries() : Promise<CountryRow[]> {
   const { data, error } = await supabase
-    .from('mvp_countries')
+    .from('v_countries')
     .select('*')
-    .order('name');
+    .order('country_name');
 
-  if (error) throw error;  
+  if (error) throw error;    
+
   return data ?? [];
-};
+}
 
 export const deleteCountry = async (id: number) => {
   const { error } = await supabase

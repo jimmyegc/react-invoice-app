@@ -4,8 +4,8 @@ import { createClient, updateClient } from './clients.service';
 import type { Client, ClientFormData } from './clients.types';
 
 import { useCountries } from '@/hooks/useCountries';
-import { useStates } from '@/hooks/useStates';
-import { useCities } from '@/hooks/useCities';
+import { useStatesByCountry } from '@/hooks/useStates';
+import { useCitiesByState } from '@/hooks/useCities';
 
 type Props = {
   open: boolean;
@@ -28,9 +28,9 @@ export function ClientFormModal({ open, client, onClose }: Props) {
     city_id: null,
   });
 
-  const { data: countries = [] } = useCountries();
-  const { data: states = [] } = useStates(form.country_id);
-  const { data: cities = [] } = useCities(form.state_id);
+  const { countries } = useCountries();
+  const { data: states } = useStatesByCountry(form?.country_id);
+  const { data: cities } = useCitiesByState(form?.state_id);
 
   useEffect(() => {
     if (client) {
@@ -102,6 +102,35 @@ export function ClientFormModal({ open, client, onClose }: Props) {
             }
           />
 
+          <input
+            className="border px-3 py-2 rounded w-full"
+            placeholder="RFC"
+            value={form.rfc}
+            onChange={(e) =>
+              setForm({ ...form, rfc: e.target.value })
+            }
+          />
+
+                    <input
+            className="border px-3 py-2 rounded w-full"
+            placeholder="Teléfono"
+            value={form.phone}
+            onChange={(e) =>
+              setForm({ ...form, phone: e.target.value })
+            }
+          />
+
+                   <input
+            className="border px-3 py-2 rounded w-full"
+            placeholder="Correo electrónico"
+            value={form.email}
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
+          />
+
+          
+
           <select
             className="border px-3 py-2 rounded w-full"
             value={form.country_id ?? ''}
@@ -115,15 +144,15 @@ export function ClientFormModal({ open, client, onClose }: Props) {
             }
           >
             <option value="">País</option>
-            {JSON.stringify(countries)}
+            
             {countries.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
+    <option key={c.country_id} value={c.country_id}>
+      {c.country_name}
+    </option>
+  ))}
           </select>
 
-          <select
+           <select
             className="border px-3 py-2 rounded w-full"
             value={form.state_id ?? ''}
             disabled={!form.country_id}
@@ -136,9 +165,9 @@ export function ClientFormModal({ open, client, onClose }: Props) {
             }
           >
             <option value="">Estado</option>
-            {states.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
+            {states?.map((s) => (
+              <option key={s.state_id} value={s.state_id}>
+                {s.state_name}
               </option>
             ))}
           </select>
@@ -152,12 +181,12 @@ export function ClientFormModal({ open, client, onClose }: Props) {
             }
           >
             <option value="">Ciudad</option>
-            {cities.map((c) => (
+            {cities?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
-          </select>
+          </select> 
 
           <input
             className="border px-3 py-2 rounded w-full"

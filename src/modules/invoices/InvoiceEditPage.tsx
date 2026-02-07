@@ -5,6 +5,27 @@ import { supabase } from '@/app/supabase';
 import { Card, Button } from '@/components/ui';
 import { InvoiceForm } from './InvoiceForm';
 
+type InvoiceStatus = 'draft' | 'issued' | 'paid' | 'cancelled';
+
+function canEditInvoice(status: InvoiceStatus) {
+  return status === 'draft' || status === 'issued';
+}
+
+function canChangeStatus(
+  current: InvoiceStatus,
+  next: InvoiceStatus
+) {
+  const rules: Record<InvoiceStatus, InvoiceStatus[]> = {
+    draft: ['issued'],
+    issued: ['paid', 'cancelled'],
+    paid: [],
+    cancelled: [],
+  };
+
+  return rules[current].includes(next);
+}
+
+
 export function InvoiceEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -28,9 +49,33 @@ export function InvoiceEditPage() {
     setLoading(false);
   }
 
+  async function handleStatusChange(nextStatus: InvoiceStatus) {
+  if (!invoice) return;
+
+  if (!canChangeStatus(invoice.status, nextStatus)) {
+    alert('Cambio de estatus no permitido');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('mvp_invoices')
+    .update({ status: nextStatus })
+    .eq('id', invoice.id);
+
+  if (!error) {
+    setInvoice({ ...invoice, status: nextStatus });
+  }
+}
+
+
   // Guardar cambios
   async function handleSaved(data: any) {
     if (!invoice) return;
+
+      if (!canEditInvoice(invoice.status)) {
+    alert('Esta factura ya no puede editarse');
+    return;
+  }
 
     setLoading(true);
 
@@ -106,12 +151,38 @@ export function InvoiceEditPage() {
           Editar factura #{invoice.folio}
         </h1>
 
+        <div className="flex items-center gap-3">
+  <span className="text-sm px-2 py-1 rounded bg-gray-100">
+    {invoice.status}
+  </span>
+
+  <select
+    value={invoice.status}
+    onChange={(e) =>
+      handleStatusChange(e.target.value as InvoiceStatus)
+    }
+    disabled={
+      invoice.status === 'paid' ||
+      invoice.status === 'cancelled'
+    }
+    className="border px-2 py-1 rounded text-sm"
+  >
+    <option value="draft">Borrador</option>
+    <option value="issued">Emitida</option>
+    <option value="paid">Pagada</option>
+    <option value="cancelled">Cancelada</option>
+  </select>
+</div>
+
+
         <Button
           variant="ghost"
           onClick={() => navigate(`/invoices/${invoice.id}`)}
         >
           Cancelar
         </Button>
+
+
       </div>
 
       <Card>
@@ -119,6 +190,7 @@ export function InvoiceEditPage() {
           initialData={invoice}
           onSubmit={handleSaved}
           loading={loading}
+          /* disabled={!canEditInvoice(invoice.status)} */
         />
       </Card>
     </div>

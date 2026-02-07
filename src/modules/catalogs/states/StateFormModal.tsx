@@ -17,7 +17,7 @@ export function StateFormModal({
   onClose,
 }: {
   open: boolean;
-  state?: any | null; // ← viene de la vista
+  state?: any | null; 
   onClose: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -108,8 +108,8 @@ export function StateFormModal({
           >
             <option value="">País</option>
             {countries.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
+              <option key={c.country_id} value={c.country_id}>
+                {c.country_name}
               </option>
             ))}
           </Select>

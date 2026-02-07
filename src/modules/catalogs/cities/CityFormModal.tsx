@@ -152,8 +152,8 @@ export function CityFormModal({
           >
             <option value="">País</option>
             {countries.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
+              <option key={c.country_id} value={c.country_id}>
+                {c.country_name}
               </option>
             ))}
           </Select>

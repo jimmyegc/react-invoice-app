@@ -2,10 +2,14 @@ import { useState } from 'react';
 import { ClientsTable } from './ClientsTable';
 import { ClientFormModal } from './ClientFormModal';
 import type { Client } from './clients.types';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export function ClientsPage() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Client | null>(null);
+  const [search, setSearch] = useState('');
+
+  const debouncedSearch = useDebounce(search, 500);
 
   return (
     <div className="space-y-4">
@@ -23,7 +27,15 @@ export function ClientsPage() {
         </button>
       </div>
 
+      <input
+        className="border px-3 py-2 rounded w-full"
+        placeholder="Buscar cliente..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <ClientsTable
+        search={debouncedSearch}
         onEdit={(client) => {
           setSelected(client);
           setOpen(true);

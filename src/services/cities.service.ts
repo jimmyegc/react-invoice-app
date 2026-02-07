@@ -17,6 +17,7 @@ export const getCitiesByState = async (stateId: number) => {
     .order('name');
 
   if (error) throw error;
+  
   return data;
 };
 
