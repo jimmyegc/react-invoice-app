@@ -1,4 +1,4 @@
-import { Card, Button, Table } from '@/components/ui';
+import { Card, Button, Table, PageLoader } from '@/components/ui';
 import { useCities } from '@/hooks/useCities';
 import { useState } from 'react';
 import { CityFormModal } from './CityFormModal';
@@ -10,6 +10,8 @@ export function CitiesPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const queryClient = useQueryClient();
+
+  if(isLoading) return <PageLoader/>;
 
   return (
     <Card>

@@ -1,4 +1,4 @@
-import { Card, Button, Table } from '@/components/ui';
+import { Card, Button, Table, PageLoader } from '@/components/ui';
 import { useStates } from '@/hooks/useStates';
 import { useState } from 'react';
 import { StateFormModal } from './StateFormModal';
@@ -10,6 +10,8 @@ export function StatesPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const queryClient = useQueryClient();
+
+  if(isLoading) return <PageLoader/>;
 
   return (
     <Card>
@@ -69,7 +71,7 @@ export function StatesPage() {
       )}
 
       <StateFormModal
-        key={editing?.id ?? 'new'}   // 🔥 mata estado interno
+        key={editing?.id ?? 'new'}
         open={open}
         state={editing}
         onClose={() => {

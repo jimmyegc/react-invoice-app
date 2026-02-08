@@ -152,6 +152,7 @@ export function InvoiceEditPage() {
         </h1>
 
         <div className="flex items-center gap-3">
+          
   <span className="text-sm px-2 py-1 rounded bg-gray-100">
     {invoice.status}
   </span>

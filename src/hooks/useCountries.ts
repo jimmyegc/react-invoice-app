@@ -61,13 +61,10 @@ export function useCountries() {
     },
   });
 
-  return {
-    // data
+  return {    
     countries: countriesQuery.data ?? [],
     isLoading: countriesQuery.isLoading,
-    isError: countriesQuery.isError,
-
-    // actions
+    isError: countriesQuery.isError,    
     createCountry: createCountry.mutateAsync,
     updateCountry: updateCountry.mutateAsync,
     deleteCountry: deleteCountry.mutateAsync,

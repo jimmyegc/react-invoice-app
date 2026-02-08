@@ -1,4 +1,3 @@
-// hooks/useCrud.ts
 import { supabase } from '@/app/supabase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 

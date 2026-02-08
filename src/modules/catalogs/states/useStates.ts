@@ -1,4 +1,3 @@
-// modules/catalogs/states/useStates.ts
 import { supabase } from '@/app/supabase';
 
 export function useStates() {

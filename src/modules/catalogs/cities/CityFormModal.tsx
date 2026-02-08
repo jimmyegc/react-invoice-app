@@ -1,4 +1,3 @@
-// modules/cities/CityFormModal.tsx
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -89,8 +88,7 @@ export function CityFormModal({
   useEffect(() => {
     if (!open) return;
 
-    if (isEditing) {
-      // 1️⃣ Seteamos nombre y país primero
+    if (isEditing) {      
       reset({
         name: city.city_name,
         country_id: city.country_id,

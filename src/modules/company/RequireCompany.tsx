@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useCompany } from './useCompany';
+import { useCompany } from '../../hooks/useCompany';
 
 export function RequireCompany() {
   const { data: company, isLoading } = useCompany();

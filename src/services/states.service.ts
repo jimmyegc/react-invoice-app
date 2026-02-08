@@ -1,16 +1,5 @@
 import { supabase } from '@/app/supabase';
-
-export type StateRow = {
-  state_id: number;
-  state_name: string;
-  country_id: number;
-  country_name: string;
-};
-
-export type CreateStatePayload = {
-  name: string;
-  country_id: number;
-};
+import type { StateRow, CreateStatePayload } from '@/types/states';
 
 export const getStatesByCountry = async (countryId: number) => {
   const { data, error } = await supabase
@@ -38,7 +27,7 @@ export async function getStates(): Promise<StateRow[]> {
 
 export async function createState(payload: CreateStatePayload) {
   const { error } = await supabase
-    .from('mvp_states') // 👈 tabla real
+    .from('mvp_states') 
     .insert({
       name: payload.name,
       country_id: payload.country_id,

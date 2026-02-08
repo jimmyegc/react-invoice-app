@@ -1,4 +1,5 @@
 import { Table, Button } from '@/components/ui';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 type Item = {
   id?: number;
@@ -123,7 +124,7 @@ export function InvoiceItemsTable({
               </td>
 
               <td className="p-2 text-right">
-                ${item.total}
+                {formatCurrency(item.total)}
               </td>
 
               {editable && (

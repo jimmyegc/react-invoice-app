@@ -1,4 +1,4 @@
-import { Card, Button, Table } from '@/components/ui';
+import { Card, Button, Table, PageLoader } from '@/components/ui';
 import { useCountries } from '@/hooks/useCountries';
 import { useState } from 'react';
 import { CountryFormModal } from './CountryFormModal';
@@ -10,6 +10,8 @@ export function CountriesPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const queryClient = useQueryClient();
+
+  if(isLoading) return <PageLoader />;
 
   return (
     <Card>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/app/supabase';
 import { Card, Button } from '@/components/ui';
 import { InvoiceItemsTable } from './InvoiceItemsTable';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 type Props = {
   initialData?: any; // ahora opcional
@@ -101,17 +102,17 @@ export function InvoiceForm({ initialData, onSubmit, loading }: Props) {
           <div className="w-full max-w-xs space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${subtotal}</span>
+              <span>{formatCurrency(subtotal)}</span>
             </div>
 
             <div className="flex justify-between">
               <span>Impuestos</span>
-              <span>${tax}</span>
+              <span>{formatCurrency(tax)}</span>
             </div>
 
             <div className="flex justify-between font-semibold text-base">
               <span>Total</span>
-              <span>${total}</span>
+              <span>{formatCurrency(total)}</span>
             </div>
           </div>
         </div>

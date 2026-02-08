@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import { useSettings } from './useSettings';
-import { useCompany } from '@/modules/company/useCompany';
+import { useCompany } from '@/hooks/useCompany';
 
 type SettingsContextType = {
   companyId: string | null;
