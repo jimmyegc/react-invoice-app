@@ -97,6 +97,13 @@ npm run dev
 
 ---
 
+## 💻 Screenshots
+
+![Preview](/screenshots/screenshot-01.png)
+![Preview](/screenshots/screenshot-02.png)
+
+---
+
 ## 🧠 Notas
 
 - El archivo `init.sql` es idempotente (se puede ejecutar múltiples veces).
