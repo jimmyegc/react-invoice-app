@@ -33,18 +33,10 @@ export function StateFormModal({
     },
   });
 
-  /* =========================
-     Queries
-  ========================= */
-
   const { data: countries = [] } = useQuery({
     queryKey: ['countries'],
     queryFn: getCountries,
   });
-
-  /* =========================
-     Mutación
-  ========================= */
 
   const mutation = useMutation({
     mutationFn: async (data: FormValues) => {
@@ -67,10 +59,6 @@ export function StateFormModal({
       onClose();
     },
   });
-
-  /* =========================
-     Inicialización del form
-  ========================= */
 
   useEffect(() => {
     if (!open) return;

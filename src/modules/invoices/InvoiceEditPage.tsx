@@ -1,30 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/app/supabase';
-import { Card, Button } from '@/components/ui';
-import { InvoiceForm } from './InvoiceForm';
-import { PageLoader } from '@/components/ui/PageLoader';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { supabase } from "@/app/supabase";
+import { Card, Button } from "@/components/ui";
+import { InvoiceForm } from "./InvoiceForm";
+import { PageLoader } from "@/components/ui/PageLoader";
 
-type InvoiceStatus = 'draft' | 'issued' | 'paid' | 'cancelled';
+type InvoiceStatus = "draft" | "issued" | "paid" | "cancelled";
 
 function canEditInvoice(status: InvoiceStatus) {
-  return status === 'draft' || status === 'issued';
+  return status === "draft" || status === "issued";
 }
 
-function canChangeStatus(
-  current: InvoiceStatus,
-  next: InvoiceStatus
-) {
+function canChangeStatus(current: InvoiceStatus, next: InvoiceStatus) {
   const rules: Record<InvoiceStatus, InvoiceStatus[]> = {
-    draft: ['issued'],
-    issued: ['paid', 'cancelled'],
+    draft: ["issued"],
+    issued: ["paid", "cancelled"],
     paid: [],
     cancelled: [],
   };
 
   return rules[current].includes(next);
 }
-
 
 export function InvoiceEditPage() {
   const { id } = useParams();
@@ -36,13 +32,12 @@ export function InvoiceEditPage() {
     if (id) loadInvoice();
   }, [id]);
 
-  // Cargar factura
   async function loadInvoice() {
     setLoading(true);
     const { data, error } = await supabase
-      .from('mvp_invoices')
+      .from("mvp_invoices")
       .select(`*, mvp_invoice_items(*)`)
-      .eq('id', id)
+      .eq("id", id)
       .single();
 
     if (!error) setInvoice(data);
@@ -50,38 +45,35 @@ export function InvoiceEditPage() {
   }
 
   async function handleStatusChange(nextStatus: InvoiceStatus) {
-  if (!invoice) return;
+    if (!invoice) return;
 
-  if (!canChangeStatus(invoice.status, nextStatus)) {
-    alert('Cambio de estatus no permitido');
-    return;
+    if (!canChangeStatus(invoice.status, nextStatus)) {
+      alert("Cambio de estatus no permitido");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("mvp_invoices")
+      .update({ status: nextStatus })
+      .eq("id", invoice.id);
+
+    if (!error) {
+      setInvoice({ ...invoice, status: nextStatus });
+    }
   }
 
-  const { error } = await supabase
-    .from('mvp_invoices')
-    .update({ status: nextStatus })
-    .eq('id', invoice.id);
-
-  if (!error) {
-    setInvoice({ ...invoice, status: nextStatus });
-  }
-}
-
-
-  // Guardar cambios
   async function handleSaved(data: any) {
     if (!invoice) return;
 
-      if (!canEditInvoice(invoice.status)) {
-    alert('Esta factura ya no puede editarse');
-    return;
-  }
+    if (!canEditInvoice(invoice.status)) {
+      alert("Esta factura ya no puede editarse");
+      return;
+    }
 
     setLoading(true);
 
-    // 1️⃣ Actualizar factura
     const { error: invoiceError } = await supabase
-      .from('mvp_invoices')
+      .from("mvp_invoices")
       .update({
         client_id: data.client_id,
         issue_date: data.issue_date,
@@ -89,59 +81,54 @@ export function InvoiceEditPage() {
         tax: data.tax,
         total: data.total,
       })
-      .eq('id', invoice.id);
+      .eq("id", invoice.id);
 
     if (invoiceError) {
       setLoading(false);
       return;
     }
 
-    // 2️⃣ Manejar items
     const existingItems = invoice.mvp_invoice_items || [];
 
-    // Separar items nuevos y existentes
     const newItems = data.items.filter((i: any) => !i.id);
     const updatedItems = data.items.filter((i: any) => i.id);
     const removedItems = existingItems.filter(
-      (ei: any) => !updatedItems.some((ui: any) => ui.id === ei.id)
+      (ei: any) => !updatedItems.some((ui: any) => ui.id === ei.id),
     );
 
-    // Insertar nuevos
     if (newItems.length) {
-      await supabase.from('mvp_invoice_items').insert(
+      await supabase.from("mvp_invoice_items").insert(
         newItems.map((i: any) => ({
           invoice_id: invoice.id,
           description: i.description,
           quantity: i.quantity,
           price: i.price,
           total: i.total,
-        }))
+        })),
       );
     }
 
-    // Actualizar existentes
     for (const i of updatedItems) {
       await supabase
-        .from('mvp_invoice_items')
+        .from("mvp_invoice_items")
         .update({
           description: i.description,
           quantity: i.quantity,
           price: i.price,
           //total: i.total,
         })
-        .eq('id', i.id);
+        .eq("id", i.id);
     }
 
-    // Eliminar borrados
     for (const i of removedItems) {
-      await supabase.from('mvp_invoice_items').delete().eq('id', i.id);
+      await supabase.from("mvp_invoice_items").delete().eq("id", i.id);
     }
 
     setLoading(false);
     navigate(`/invoices/${invoice.id}`);
   }
 
-  if (loading) return <PageLoader/>;
+  if (loading) return <PageLoader />;
   if (!invoice) return <p>Factura no encontrada</p>;
 
   return (
@@ -152,29 +139,26 @@ export function InvoiceEditPage() {
         </h1>
 
         <div className="flex items-center gap-3">
-          
-  <span className="text-sm px-2 py-1 rounded bg-gray-100">
-    {invoice.status}
-  </span>
+          <span className="text-sm px-2 py-1 rounded bg-gray-100">
+            {invoice.status}
+          </span>
 
-  <select
-    value={invoice.status}
-    onChange={(e) =>
-      handleStatusChange(e.target.value as InvoiceStatus)
-    }
-    disabled={
-      invoice.status === 'paid' ||
-      invoice.status === 'cancelled'
-    }
-    className="border px-2 py-1 rounded text-sm"
-  >
-    <option value="draft">Borrador</option>
-    <option value="issued">Emitida</option>
-    <option value="paid">Pagada</option>
-    <option value="cancelled">Cancelada</option>
-  </select>
-</div>
-
+          <select
+            value={invoice.status}
+            onChange={(e) =>
+              handleStatusChange(e.target.value as InvoiceStatus)
+            }
+            disabled={
+              invoice.status === "paid" || invoice.status === "cancelled"
+            }
+            className="border px-2 py-1 rounded text-sm"
+          >
+            <option value="draft">Borrador</option>
+            <option value="issued">Emitida</option>
+            <option value="paid">Pagada</option>
+            <option value="cancelled">Cancelada</option>
+          </select>
+        </div>
 
         <Button
           variant="ghost"
@@ -182,8 +166,6 @@ export function InvoiceEditPage() {
         >
           Cancelar
         </Button>
-
-
       </div>
 
       <Card>

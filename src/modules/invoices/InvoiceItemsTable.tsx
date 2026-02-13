@@ -1,5 +1,5 @@
-import { Table, Button } from '@/components/ui';
-import { formatCurrency } from '@/utils/formatCurrency';
+import { Table, Button } from "@/components/ui";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 type Item = {
   id?: number;
@@ -41,7 +41,7 @@ export function InvoiceItemsTable({
     onChange([
       ...items,
       {
-        description: '',
+        description: "",
         quantity: 1,
         price: 0,
         total: 0,
@@ -123,9 +123,7 @@ export function InvoiceItemsTable({
                 )}
               </td>
 
-              <td className="p-2 text-right">
-                {formatCurrency(item.total)}
-              </td>
+              <td className="p-2 text-right">{formatCurrency(item.total)}</td>
 
               {editable && (
                 <td className="p-2 text-right">
@@ -142,11 +140,7 @@ export function InvoiceItemsTable({
         </tbody>
       </Table>
 
-      {editable && (
-        <Button onClick={addItem}>
-          Agregar concepto
-        </Button>
-      )}
+      {editable && <Button onClick={addItem}>Agregar concepto</Button>}
     </div>
   );
 }

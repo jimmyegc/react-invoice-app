@@ -40,10 +40,6 @@ export function CityFormModal({
 
   const countryId = watch('country_id');
 
-  /* =========================
-     Queries
-  ========================= */
-
   const { data: countries = [] } = useQuery({
     queryKey: ['countries'],
     queryFn: getCountries,
@@ -54,10 +50,6 @@ export function CityFormModal({
     queryFn: () => getStatesByCountry(countryId!),
     enabled: !!countryId,
   });
-
-  /* =========================
-     Mutación
-  ========================= */
 
   const mutation = useMutation({
     mutationFn: async (data: FormValues) => {
@@ -81,10 +73,6 @@ export function CityFormModal({
     },
   });
 
-  /* =========================
-     Inicialización del form
-  ========================= */
-
   useEffect(() => {
     if (!open) return;
 
@@ -103,11 +91,6 @@ export function CityFormModal({
     }
   }, [open, city, isEditing, reset]);
 
-  /* =========================
-     Setear estado SOLO cuando
-     los states ya cargaron
-  ========================= */
-
   useEffect(() => {
     if (!isEditing) return;
     if (!statesLoaded) return;
@@ -120,10 +103,6 @@ export function CityFormModal({
       setValue('state_id', city.state_id);
     }
   }, [isEditing, statesLoaded, states, city, setValue]);
-
-  /* =========================
-     Cambio de país (crear)
-  ========================= */
 
   useEffect(() => {
     if (!isEditing) {

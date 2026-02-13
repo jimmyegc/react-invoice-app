@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/app/supabase';
-import { Card, Button, Table } from '@/components/ui';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/app/supabase";
+import { Card, Button, Table } from "@/components/ui";
 
 export function InvoicesPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -13,16 +13,18 @@ export function InvoicesPage() {
 
   async function fetchInvoices() {
     const { data, error } = await supabase
-      .from('mvp_invoices')
-      .select(`
+      .from("mvp_invoices")
+      .select(
+        `
         id,
         folio,
         issue_date,
         status,
         total,
         mvp_clients ( name )
-      `)
-      .order('created_at', { ascending: false });
+      `,
+      )
+      .order("created_at", { ascending: false });
 
     if (!error) setInvoices(data || []);
   }
@@ -32,9 +34,7 @@ export function InvoicesPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Facturas</h1>
 
-        <Button onClick={() => navigate('/invoices/new')}>
-          Nueva factura
-        </Button>
+        <Button onClick={() => navigate("/invoices/new")}>Nueva factura</Button>
       </div>
 
       <Card>
@@ -51,7 +51,7 @@ export function InvoicesPage() {
           </thead>
 
           <tbody>
-            {invoices.map(inv => (
+            {invoices.map((inv) => (
               <tr key={inv.id} className="border-t text-sm">
                 <td className="p-2">{inv.folio}</td>
                 <td className="p-2">{inv.mvp_clients?.name}</td>
@@ -67,12 +67,10 @@ export function InvoicesPage() {
                     Ver
                   </Button>
 
-                  {(inv.status === 'draft' || inv.status === 'issued') && (
+                  {(inv.status === "draft" || inv.status === "issued") && (
                     <Button
                       variant="ghost"
-                      onClick={() =>
-                        navigate(`/invoices/${inv.id}/edit`)
-                      }
+                      onClick={() => navigate(`/invoices/${inv.id}/edit`)}
                     >
                       Editar
                     </Button>
@@ -80,9 +78,7 @@ export function InvoicesPage() {
 
                   <Button
                     variant="ghost"
-                    onClick={() =>
-                      navigate(`/invoices/${inv.id}/print`)
-                    }
+                    onClick={() => navigate(`/invoices/${inv.id}/print`)}
                   >
                     Imprimir
                   </Button>

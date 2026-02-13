@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/app/supabase';
-import { Card, Button } from '@/components/ui';
-import { InvoiceItemsTable } from './InvoiceItemsTable';
-import { formatCurrency } from '@/utils/formatCurrency';
+import { useEffect, useState } from "react";
+import { supabase } from "@/app/supabase";
+import { Card, Button } from "@/components/ui";
+import { InvoiceItemsTable } from "./InvoiceItemsTable";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 type Props = {
-  initialData?: any; // ahora opcional
+  initialData?: any;
   onSubmit: (data: any) => void;
   loading?: boolean;
 };
@@ -14,20 +14,18 @@ export function InvoiceForm({ initialData, onSubmit, loading }: Props) {
   const [clients, setClients] = useState<any[]>([]);
   const [clientId, setClientId] = useState<string | null>(null);
   const [issueDate, setIssueDate] = useState(
-    new Date().toISOString().slice(0, 10)
+    new Date().toISOString().slice(0, 10),
   );
   const [items, setItems] = useState<any[]>([]);
 
-  // cargar clientes
   useEffect(() => {
     supabase
-      .from('mvp_clients')
-      .select('id, name')
-      .order('name')
+      .from("mvp_clients")
+      .select("id, name")
+      .order("name")
       .then(({ data }) => setClients(data || []));
   }, []);
 
-  // inicializar con datos existentes
   useEffect(() => {
     if (initialData) {
       setClientId(initialData.client_id);
@@ -37,7 +35,7 @@ export function InvoiceForm({ initialData, onSubmit, loading }: Props) {
   }, [initialData]);
 
   const subtotal = items.reduce((sum, i) => sum + i.total, 0);
-  const tax = subtotal * 0.16; // listo para crecer
+  const tax = subtotal * 0.16;
   const total = subtotal + tax;
 
   async function submit() {
@@ -50,7 +48,7 @@ export function InvoiceForm({ initialData, onSubmit, loading }: Props) {
       subtotal,
       tax,
       total,
-      id: initialData?.id, // enviar id si es edición
+      id: initialData?.id,
     });
   }
 
@@ -63,7 +61,7 @@ export function InvoiceForm({ initialData, onSubmit, loading }: Props) {
             <label className="block mb-1 font-medium">Cliente</label>
             <select
               className="border px-3 py-2 rounded w-full"
-              value={clientId ?? ''}
+              value={clientId ?? ""}
               onChange={(e) => setClientId(e.target.value || null)}
             >
               <option value="">Seleccionar cliente</option>
@@ -89,11 +87,7 @@ export function InvoiceForm({ initialData, onSubmit, loading }: Props) {
 
       {/* Items */}
       <Card>
-        <InvoiceItemsTable
-          items={items}
-          editable
-          onChange={setItems}
-        />
+        <InvoiceItemsTable items={items} editable onChange={setItems} />
       </Card>
 
       {/* Totales */}
@@ -120,8 +114,15 @@ export function InvoiceForm({ initialData, onSubmit, loading }: Props) {
 
       {/* Acciones */}
       <div className="flex justify-end gap-2">
-        <Button onClick={submit} disabled={loading || !clientId || items.length === 0}>
-          {loading ? 'Guardando…' : initialData ? 'Actualizar factura' : 'Crear factura'}
+        <Button
+          onClick={submit}
+          disabled={loading || !clientId || items.length === 0}
+        >
+          {loading
+            ? "Guardando…"
+            : initialData
+              ? "Actualizar factura"
+              : "Crear factura"}
         </Button>
       </div>
     </div>

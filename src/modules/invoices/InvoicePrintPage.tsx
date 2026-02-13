@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { supabase } from '@/app/supabase';
-import { Table } from '@/components/ui';
-import { Button } from '@/components/ui';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { supabase } from "@/app/supabase";
+import { Table } from "@/components/ui";
+import { Button } from "@/components/ui";
 
 export function InvoicePrintPage() {
   const { id } = useParams();
@@ -14,13 +14,15 @@ export function InvoicePrintPage() {
 
   async function fetchInvoice() {
     const { data, error } = await supabase
-      .from('mvp_invoices')
-      .select(`
+      .from("mvp_invoices")
+      .select(
+        `
         *,
         mvp_clients ( name ),
         mvp_invoice_items ( * )
-      `)
-      .eq('id', id)
+      `,
+      )
+      .eq("id", id)
       .single();
 
     if (!error) setInvoice(data);
@@ -30,19 +32,23 @@ export function InvoicePrintPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-8 text-sm print:p-0 print:mx-0 print:max-w-full">
-       <div className="flex justify-end mb-4 print:hidden">
-        <Button onClick={() => window.print()}>
-          Imprimir factura
-        </Button>
+      <div className="flex justify-end mb-4 print:hidden">
+        <Button onClick={() => window.print()}>Imprimir factura</Button>
       </div>
       <h1 className="text-2xl font-semibold mb-4 print:text-xl">
         Factura {invoice.folio}
       </h1>
 
       <div className="mb-4 print:mb-2">
-        <p><strong>Cliente:</strong> {invoice.mvp_clients?.name}</p>
-        <p><strong>Fecha:</strong> {invoice.issue_date}</p>
-        <p><strong>Status:</strong> {invoice.status}</p>
+        <p>
+          <strong>Cliente:</strong> {invoice.mvp_clients?.name}
+        </p>
+        <p>
+          <strong>Fecha:</strong> {invoice.issue_date}
+        </p>
+        <p>
+          <strong>Status:</strong> {invoice.status}
+        </p>
       </div>
 
       {/* Items */}
@@ -70,7 +76,6 @@ export function InvoicePrintPage() {
         </Table>
       </div>
 
-      {/* Totales */}
       <div className="flex justify-end mt-4 print:mt-2">
         <div className="w-full max-w-xs space-y-2 text-sm print:w-64">
           <div className="flex justify-between">
@@ -90,7 +95,6 @@ export function InvoicePrintPage() {
         </div>
       </div>
 
-      {/* Estilos específicos para impresión */}
       <style>
         {`
           @media print {

@@ -48,7 +48,7 @@ export function ClientsTable({
               <td className="p-2">{c.business_name}</td>
               <td className="p-2">{c.rfc}</td>
               <td className="p-2">{c.phone}</td>
-               <td className="p-2">{c.email}</td>
+              <td className="p-2">{c.email}</td>
               <td className="p-2 text-right space-x-2">
                 <button
                   onClick={() => onEdit(c)}

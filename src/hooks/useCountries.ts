@@ -4,14 +4,12 @@ import { getCountries } from '@/services/countries.service';
 
 export function useCountries() {
   const queryClient = useQueryClient();
-
-  /* -------- GET -------- */
+  
   const countriesQuery = useQuery({
     queryKey: ['countries'],
     queryFn: getCountries,
   });
-
-  /* -------- CREATE -------- */
+  
   const createCountry = useMutation({
     mutationFn: async (payload: { name: string; iso: string }) => {
       const { error } = await supabase
@@ -25,7 +23,6 @@ export function useCountries() {
     },
   });
 
-  /* -------- UPDATE -------- */
   const updateCountry = useMutation({
     mutationFn: async ({
       id,
@@ -45,8 +42,7 @@ export function useCountries() {
       queryClient.invalidateQueries({ queryKey: ['countries'] });
     },
   });
-
-  /* -------- DELETE -------- */
+  
   const deleteCountry = useMutation({
     mutationFn: async (id: number) => {
       const { error } = await supabase

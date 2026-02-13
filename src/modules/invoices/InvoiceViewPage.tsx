@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/app/supabase';
-import { Card, Button, Table } from '@/components/ui';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { supabase } from "@/app/supabase";
+import { Card, Button, Table } from "@/components/ui";
 
 export function InvoiceViewPage() {
   const { id } = useParams();
@@ -14,13 +14,15 @@ export function InvoiceViewPage() {
 
   async function loadInvoice() {
     const { data, error } = await supabase
-      .from('mvp_invoices')
-      .select(`
+      .from("mvp_invoices")
+      .select(
+        `
         *,
         mvp_clients (*),
         mvp_invoice_items (*)
-      `)
-      .eq('id', id)
+      `,
+      )
+      .eq("id", id)
       .single();
 
     if (!error) setInvoice(data);
@@ -34,33 +36,20 @@ export function InvoiceViewPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-xl font-semibold">
-          Factura #{invoice.folio}
-        </h1>
+        <h1 className="text-xl font-semibold">Factura #{invoice.folio}</h1>
 
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/invoices')}
-          >
+          <Button variant="ghost" onClick={() => navigate("/invoices")}>
             Volver
           </Button>
 
-          {invoice.status === 'draft' && (
-            <Button
-              onClick={() =>
-                navigate(`/invoices/${invoice.id}/edit`)
-              }
-            >
+          {invoice.status === "draft" && (
+            <Button onClick={() => navigate(`/invoices/${invoice.id}/edit`)}>
               Editar
             </Button>
           )}
 
-          <Button
-            onClick={() =>
-              navigate(`/invoices/${invoice.id}/print`)
-            }
-          >
+          <Button onClick={() => navigate(`/invoices/${invoice.id}/print`)}>
             Imprimir
           </Button>
         </div>
@@ -103,12 +92,8 @@ export function InvoiceViewPage() {
               <tr key={item.id} className="border-t text-sm">
                 <td className="p-2">{item.description}</td>
                 <td className="p-2 text-right">{item.quantity}</td>
-                <td className="p-2 text-right">
-                  ${item.price}
-                </td>
-                <td className="p-2 text-right">
-                  ${item.total}
-                </td>
+                <td className="p-2 text-right">${item.price}</td>
+                <td className="p-2 text-right">${item.total}</td>
               </tr>
             ))}
           </tbody>

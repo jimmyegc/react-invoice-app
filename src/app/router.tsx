@@ -1,7 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RequireCompany } from '@/modules/company/RequireCompany';
-
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ClientsPage } from '@/modules/clients/ClientsPage';
 import { CompanySetupPage } from '@/modules/company/CompanySetupPage';
